@@ -3,96 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OpenClaw Pet</title>
+    <title>🐣 OpenClaw Pet</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--tg-theme-bg-color, #1a1a2e);
-            color: var(--tg-theme-text-color, #ffffff);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             height: 100vh;
             overflow: hidden;
+            position: relative;
+        }
+        
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: float 10s infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
         }
         
         .container {
+            position: relative;
+            z-index: 1;
             max-width: 400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
         
+        /* Header with streak */
         .header {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        
-        .header h1 {
-            font-size: 24px;
-            color: var(--tg-theme-button-color, #4ecdc4);
-        }
-        
-        .pet-screen {
-            background: var(--tg-theme-secondary-bg-color, #0f0f23);
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .streak {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .streak-fire {
+            font-size: 24px;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        .pet-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
             padding: 25px;
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .level-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+            margin-bottom: 20px;
         }
         
         .pet-container {
-            width: 150px;
-            height: 150px;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 10px 0;
+            margin: 20px 0;
+            position: relative;
         }
         
         .pet-emoji {
             font-size: 100px;
-            animation: bounce 2s infinite;
+            animation: petBounce 2s infinite ease-in-out;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+            cursor: pointer;
+            transition: transform 0.2s;
         }
         
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+        .pet-emoji:active {
+            transform: scale(0.9);
+        }
+        
+        @keyframes petBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            25% { transform: translateY(-10px) scale(1.05); }
+            50% { transform: translateY(0) scale(1); }
+            75% { transform: translateY(-5px) scale(1.02); }
+        }
+        
+        .pet-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: glow 3s infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .xp-bar-container {
+            width: 100%;
+            margin: 15px 0;
+        }
+        
+        .xp-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+        
+        .xp-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(240, 147, 251, 0.5);
         }
         
         .stats {
             width: 100%;
-            margin-top: 15px;
+            margin-top: 10px;
         }
         
         .stat {
             display: flex;
             align-items: center;
-            margin: 10px 0;
+            margin: 12px 0;
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 15px;
+        }
+        
+        .stat-icon {
+            font-size: 24px;
+            margin-right: 10px;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .stat-info {
+            flex: 1;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 3px;
         }
         
         .stat-bar {
-            flex: 1;
-            height: 22px;
-            background: #333;
-            border-radius: 11px;
+            height: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 6px;
             overflow: hidden;
-            margin: 0 10px;
         }
         
         .stat-fill {
             height: 100%;
-            border-radius: 11px;
+            border-radius: 6px;
             transition: width 0.5s ease;
+            position: relative;
         }
         
-        .hunger { background: #ff6b6b; }
-        .happy { background: #4ecdc4; }
-        .energy { background: #45b7d1; }
+        .stat-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .hunger-fill { background: linear-gradient(90deg, #ff6b6b, #ff8e8e); }
+        .happy-fill { background: linear-gradient(90deg, #4ecdc4, #6ee7df); }
+        .energy-fill { background: linear-gradient(90deg, #45b7d1, #74c7e3); }
         
         .controls {
             display: grid;
@@ -102,74 +256,213 @@
         }
         
         .btn {
-            background: var(--tg-theme-button-color, #4ecdc4);
-            border: none;
-            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
             padding: 15px;
-            color: var(--tg-theme-button-text-color, #ffffff);
+            color: white;
             font-size: 28px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.5);
         }
         
         .btn:active {
-            transform: scale(0.95);
-            opacity: 0.8;
+            transform: translateY(0) scale(0.95);
+        }
+        
+        .btn-label {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-feed:hover { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); }
+        .btn-play:hover { background: linear-gradient(135deg, #4ecdc4, #6ee7df); }
+        .btn-code:hover { background: linear-gradient(135deg, #45b7d1, #74c7e3); }
+        
+        .achievement {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.5s ease;
+            z-index: 100;
+        }
+        
+        .achievement.show {
+            transform: translateX(-50%) translateY(0);
         }
     </style>
 </head>
 <body>
+    <div class="particles" id="particles"></div>
+    
     <div class="container">
         <div class="header">
-            <h1>🐣 OpenClaw Pet</h1>
+            <div class="streak">
+                <span class="streak-fire">🔥</span>
+                <span id="streak-count">5 Day Streak!</span>
+                <span class="streak-fire">🔥</span>
+            </div>
         </div>
         
-        <div class="pet-screen">
-            <div class="level-badge" id="level">Level 1 - Egg</div>
+        <div class="pet-card">
+            <div class="level-badge" id="level">⭐ Level 1 - Egg</div>
+            
             <div class="pet-container">
-                <div class="pet-emoji" id="pet">🥚</div>
+                <div class="pet-glow"></div>
+                <div class="pet-emoji" id="pet" onclick="petClick()">🥚</div>
+            </div>
+            
+            <div class="xp-bar-container">
+                <div class="xp-label">
+                    <span>XP</span>
+                    <span id="xp-text">0/100</span>
+                </div>
+                <div class="xp-bar">
+                    <div class="xp-fill" id="xp-bar" style="width: 0%"></div>
+                </div>
             </div>
             
             <div class="stats">
                 <div class="stat">
-                    <span>🍕</span>
-                    <div class="stat-bar">
-                        <div class="stat-fill hunger" id="hunger-bar" style="width: 50%"></div>
+                    <span class="stat-icon">🍕</span>
+                    <div class="stat-info">
+                        <div class="stat-label">Hunger</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill hunger-fill" id="hunger-bar" style="width: 50%"></div>
+                        </div>
                     </div>
-                    <span id="hunger-val">50</span>
                 </div>
                 <div class="stat">
-                    <span>😊</span>
-                    <div class="stat-bar">
-                        <div class="stat-fill happy" id="happy-bar" style="width: 50%"></div>
+                    <span class="stat-icon">😊</span>
+                    <div class="stat-info">
+                        <div class="stat-label">Happiness</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill happy-fill" id="happy-bar" style="width: 50%"></div>
+                        </div>
                     </div>
-                    <span id="happy-val">50</span>
                 </div>
                 <div class="stat">
-                    <span>⚡</span>
-                    <div class="stat-bar">
-                        <div class="stat-fill energy" id="energy-bar" style="width: 100%"></div>
+                    <span class="stat-icon">⚡</span>
+                    <div class="stat-info">
+                        <div class="stat-label">Energy</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill energy-fill" id="energy-bar" style="width: 100%"></div>
+                        </div>
                     </div>
-                    <span id="energy-val">100</span>
                 </div>
             </div>
         </div>
         
         <div class="controls">
-            <button class="btn" onclick="feed()">🍕</button>
-            <button class="btn" onclick="play()">🎮</button>
-            <button class="btn" onclick="code()">💻</button>
+            <button class="btn btn-feed" onclick="feed()">
+                🍕
+                <span class="btn-label">Feed</span>
+            </button>
+            <button class="btn btn-play" onclick="play()">
+                🎮
+                <span class="btn-label">Play</span>
+            </button>
+            <button class="btn btn-code" onclick="code()">
+                💻
+                <span class="btn-label">Code</span>
+            </button>
         </div>
+    </div>
+    
+    <div class="achievement" id="achievement">
+        🏆 Achievement Unlocked!
     </div>
 
     <script>
-        // Initialize Telegram Web App
+        // Telegram Web App
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
         
-        // Enable closing confirmation
-        tg.enableClosingConfirmation();
+        // Create particles
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 10 + 's';
+            particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+        
+        // Sound effects (using Web Audio API)
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(type) {
+                case 'feed':
+                    oscillator.frequency.value = 800;
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    break;
+                case 'play':
+                    oscillator.frequency.value = 600;
+                    oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    break;
+                case 'code':
+                    oscillator.frequency.value = 1000;
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    oscillator.start();
+                    setTimeout(() => {
+                        const osc2 = audioContext.createOscillator();
+                        const gain2 = audioContext.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(audioContext.destination);
+                        osc2.frequency.value = 1200;
+                        gain2.gain.setValueAtTime(0.2, audioContext.currentTime);
+                        gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                        osc2.start();
+                        osc2.stop(audioContext.currentTime + 0.1);
+                    }, 100);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    break;
+                case 'evolution':
+                    oscillator.frequency.value = 400;
+                    oscillator.frequency.exponentialRampToValueAtTime(1600, audioContext.currentTime + 0.5);
+                    gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.8);
+                    break;
+            }
+        }
         
         let pet = {
             stage: 0,
@@ -177,50 +470,102 @@
             happy: 50,
             energy: 100,
             xp: 0,
-            level: 1
+            level: 1,
+            streak: 5
         };
         
         const stages = ['🥚', '🤖', '💻', '🦖', '👑'];
+        const stageNames = ['Egg', 'Baby Bot', 'Teen Coder', 'Senior Dev', '10x Legend'];
         
         function updateUI() {
             document.getElementById('pet').textContent = stages[pet.stage];
-            document.getElementById('level').textContent = `Level ${pet.level} - ${['Egg', 'Baby', 'Teen', 'Adult', 'Legend'][pet.stage]}`;
+            document.getElementById('level').textContent = `⭐ Level ${pet.level} - ${stageNames[pet.stage]}`;
+            document.getElementById('xp-text').textContent = `${pet.xp}/100`;
+            document.getElementById('streak-count').textContent = `${pet.streak} Day Streak!`;
+            
+            document.getElementById('xp-bar').style.width = pet.xp + '%';
             document.getElementById('hunger-bar').style.width = pet.hunger + '%';
-            document.getElementById('hunger-val').textContent = pet.hunger;
             document.getElementById('happy-bar').style.width = pet.happy + '%';
-            document.getElementById('happy-val').textContent = pet.happy;
             document.getElementById('energy-bar').style.width = pet.energy + '%';
-            document.getElementById('energy-val').textContent = pet.energy;
+        }
+        
+        function showAchievement(text) {
+            const ach = document.getElementById('achievement');
+            ach.textContent = text;
+            ach.classList.add('show');
+            setTimeout(() => ach.classList.remove('show'), 3000);
+        }
+        
+        function petClick() {
+            playSound('play');
+            tg.HapticFeedback.impactOccurred('light');
+            const petEl = document.getElementById('pet');
+            petEl.style.transform = 'scale(1.3)';
+            setTimeout(() => petEl.style.transform = '', 200);
         }
         
         function feed() {
             pet.hunger = Math.min(100, pet.hunger + 20);
             pet.energy = Math.max(0, pet.energy - 5);
+            playSound('feed');
             tg.HapticFeedback.impactOccurred('light');
+            addXP(5);
             updateUI();
         }
         
         function play() {
             pet.happy = Math.min(100, pet.happy + 15);
             pet.energy = Math.max(0, pet.energy - 10);
+            pet.hunger = Math.max(0, pet.hunger - 10);
+            playSound('play');
             tg.HapticFeedback.impactOccurred('medium');
+            addXP(10);
             updateUI();
         }
         
         function code() {
             pet.xp += 10;
             pet.energy = Math.max(0, pet.energy - 5);
+            pet.hunger = Math.max(0, pet.hunger - 5);
+            playSound('code');
+            tg.HapticFeedback.notificationOccurred('success');
+            addXP(15);
+            updateUI();
+        }
+        
+        function addXP(amount) {
+            pet.xp += amount;
             if (pet.xp >= 100) {
                 pet.level++;
                 pet.xp = 0;
-                if (pet.level >= 5 && pet.stage < 4) {
-                    pet.stage++;
-                    tg.showPopup({ title: 'Evolution!', message: 'Your pet evolved!' });
-                }
+                checkEvolution();
             }
-            tg.HapticFeedback.notificationOccurred('success');
-            updateUI();
         }
+        
+        function checkEvolution() {
+            const oldStage = pet.stage;
+            if (pet.level >= 20) pet.stage = 4;
+            else if (pet.level >= 15) pet.stage = 3;
+            else if (pet.level >= 10) pet.stage = 2;
+            else if (pet.level >= 5) pet.stage = 1;
+            
+            if (pet.stage > oldStage) {
+                playSound('evolution');
+                tg.HapticFeedback.notificationOccurred('success');
+                showAchievement(`🎉 Evolved to ${stageNames[pet.stage]}!`);
+                tg.showPopup({
+                    title: '✨ Evolution!',
+                    message: `Your pet evolved into ${stageNames[pet.stage]}!`
+                });
+            }
+        }
+        
+        // Auto decay
+        setInterval(() => {
+            pet.hunger = Math.max(0, pet.hunger - 1);
+            pet.happy = Math.max(0, pet.happy - 1);
+            updateUI();
+        }, 60000);
         
         updateUI();
     </script>
