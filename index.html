@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🐣 OpenClaw Pet</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="dialogues.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
@@ -435,31 +436,7 @@
         const PETS = ['🤖', '💻', '🦖', '👑'];
         
         // Demands based on stats
-        const DEMANDS = {
-            hunger: [
-                "I'm starving! 🍕 FEED ME!",
-                "My tummy is rumbling... 🍕",
-                "Food please! I'm hungry! 🍕",
-                "I need energy! Feed me! 🍕"
-            ],
-            happy: [
-                "I'm bored! 🎮 PLAY with me!",
-                "Let's have fun! 🎮",
-                "I want to play! 🎮",
-                "Entertain me please! 🎮"
-            ],
-            energy: [
-                "I'm sleepy... 😴",
-                "Need rest... 💤",
-                "Tired... but want to code! 💻"
-            ],
-            code: [
-                "Let's write some code! 💻",
-                "I want to learn! 💻 CODE!",
-                "Time to program! 💻",
-                "Help me level up! 💻"
-            ]
-        };
+        // Using dialogue system from dialogues.js
         
         // ==================== EGG STATE ====================
         const eggContainer = document.getElementById('eggContainer');
@@ -531,18 +508,17 @@
             
             // Check critical stats (priority)
             if (gameState.hunger < 30) {
-                demandText = DEMANDS.hunger[Math.floor(Math.random() * DEMANDS.hunger.length)];
+                demandText = getDemand('hunger');
                 demandType = 'hunger';
                 feedBtn.classList.add('highlight');
                 document.getElementById('hungerRow').classList.add('critical');
             } else if (gameState.happy < 30) {
-                demandText = DEMANDS.happy[Math.floor(Math.random() * DEMANDS.happy.length)];
+                demandText = getDemand('happy');
                 demandType = 'happy';
                 playBtn.classList.add('highlight');
                 document.getElementById('happyRow').classList.add('critical');
             } else if (gameState.energy > 30 && gameState.xp < 50) {
-                // Wants to code if has energy and needs XP
-                demandText = DEMANDS.code[Math.floor(Math.random() * DEMANDS.code.length)];
+                demandText = getDemand('code');
                 demandType = 'code';
                 codeBtn.classList.add('highlight');
             }
@@ -573,7 +549,7 @@
                     gameState.hunger = Math.min(100, gameState.hunger + 25);
                     gameState.energy = Math.max(0, gameState.energy - 5);
                     addXP(5);
-                    bubble.textContent = "Yummy! Thanks! 🍕❤️";
+                    bubble.textContent = getResponse('feed');
                     bubble.className = 'speech-bubble hunger';
                     break;
                 case 'play':
@@ -581,7 +557,7 @@
                     gameState.energy = Math.max(0, gameState.energy - 10);
                     gameState.hunger = Math.max(0, gameState.hunger - 5);
                     addXP(10);
-                    bubble.textContent = "So much fun! 🎮😄";
+                    bubble.textContent = getResponse('play');
                     bubble.className = 'speech-bubble happy';
                     break;
                 case 'code':
@@ -593,7 +569,7 @@
                     gameState.energy = Math.max(0, gameState.energy - 8);
                     gameState.hunger = Math.max(0, gameState.hunger - 3);
                     addXP(20);
-                    bubble.textContent = "I'm learning! 💻🚀";
+                    bubble.textContent = getResponse('code');
                     bubble.className = 'speech-bubble';
                     break;
             }
