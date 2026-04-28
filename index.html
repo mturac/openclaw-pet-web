@@ -474,6 +474,11 @@
         
         // Load from localStorage
         function loadGame() {
+            // Check URL param for reset
+            if (window.location.search.includes('reset=1')) {
+                localStorage.removeItem('openclawPet');
+                return false;
+            }
             const saved = localStorage.getItem('openclawPet');
             if (saved) {
                 const data = JSON.parse(saved);
@@ -533,6 +538,11 @@
         }
         
         function showPetScreen() {
+            // Restore full pet data from PETS object
+            if (gameState.pet && gameState.pet.type && PETS[gameState.pet.type]) {
+                gameState.pet = { ...PETS[gameState.pet.type], ...gameState.pet };
+            }
+            if (!gameState.pet) { gameState.pet = PETS[gameState.pet.type] || gameState.pet; }
             eggScreen.style.display = 'none';
             petScreen.classList.add('active');
             
