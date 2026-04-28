@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🐣 OpenClaw Pet</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="dialogues.js"></script>
+    <script src="pet-data.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             height: 100vh;
@@ -18,7 +18,7 @@
             user-select: none;
         }
         
-        /* ==================== EGG SCREEN ==================== */
+        /* EGG SCREEN */
         .egg-screen {
             display: flex;
             flex-direction: column;
@@ -40,6 +40,7 @@
         
         .egg {
             font-size: 120px;
+            transition: transform 0.1s;
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
         }
         
@@ -61,15 +62,12 @@
             pointer-events: none;
         }
         
-        .crack-overlay.show {
-            opacity: 1;
-        }
+        .crack-overlay.show { opacity: 1; }
         
         .tap-hint {
             margin-top: 30px;
             text-align: center;
             font-size: 18px;
-            opacity: 0.9;
             animation: pulse 2s infinite;
         }
         
@@ -84,7 +82,7 @@
             50% { opacity: 1; transform: scale(1.05); }
         }
         
-        /* ==================== PET SCREEN ==================== */
+        /* PET SCREEN */
         .pet-screen {
             display: none;
             flex-direction: column;
@@ -94,26 +92,28 @@
             margin: 0 auto;
         }
         
-        .pet-screen.active {
-            display: flex;
-        }
+        .pet-screen.active { display: flex; }
         
         .header {
             text-align: center;
             margin-bottom: 10px;
         }
         
+        .pet-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
         .level-badge {
             background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
             padding: 8px 20px;
             border-radius: 20px;
             display: inline-block;
             font-size: 14px;
-            font-weight: bold;
         }
         
-        /* PET SPEECH BUBBLE - DEMAND */
+        /* SPEECH BUBBLE - DEMAND */
         .speech-bubble {
             background: white;
             color: #333;
@@ -139,39 +139,13 @@
             border-color: white transparent transparent;
         }
         
-        .speech-bubble.hunger {
-            background: #ff6b6b;
-            color: white;
-        }
-        
-        .speech-bubble.hunger::after {
-            border-color: #ff6b6b transparent transparent;
-        }
-        
-        .speech-bubble.happy {
-            background: #4ecdc4;
-            color: white;
-        }
-        
-        .speech-bubble.happy::after {
-            border-color: #4ecdc4 transparent transparent;
-        }
-        
-        .speech-bubble.energy {
-            background: #45b7d1;
-            color: white;
-        }
-        
-        .speech-bubble.energy::after {
-            border-color: #45b7d1 transparent transparent;
-        }
-        
         @keyframes bounceIn {
             0% { transform: scale(0); opacity: 0; }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); opacity: 1; }
         }
         
+        /* PET AREA */
         .pet-area {
             flex: 1;
             display: flex;
@@ -179,7 +153,6 @@
             align-items: center;
             justify-content: center;
             background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(20px);
             border-radius: 30px;
             margin: 10px 0;
             border: 2px solid rgba(255,255,255,0.2);
@@ -191,18 +164,16 @@
             animation: bounce 2s infinite ease-in-out;
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
             cursor: pointer;
-            transition: transform 0.2s;
         }
         
-        .pet-character:active {
-            transform: scale(0.9);
-        }
+        .pet-character:active { transform: scale(0.9); }
         
         @keyframes bounce {
             0%, 100% { transform: translateY(0) scale(1); }
             50% { transform: translateY(-15px) scale(1.05); }
         }
         
+        /* STATS */
         .stats-container {
             width: 100%;
             padding: 0 10px;
@@ -225,17 +196,17 @@
             animation: pulse-red 2s infinite;
         }
         
+        .stat-row.warning {
+            background: rgba(255,193,7,0.3);
+            border: 2px solid #ffc107;
+        }
+        
         @keyframes pulse-red {
             0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,107,0.4); }
             50% { box-shadow: 0 0 0 10px rgba(255,107,107,0); }
         }
         
-        .stat-icon {
-            font-size: 24px;
-            margin-right: 12px;
-            width: 30px;
-            text-align: center;
-        }
+        .stat-icon { font-size: 24px; margin-right: 12px; width: 30px; text-align: center; }
         
         .stat-bar-bg {
             flex: 1;
@@ -263,6 +234,7 @@
             font-size: 16px;
         }
         
+        /* CONTROLS */
         .controls {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -285,10 +257,7 @@
             gap: 5px;
         }
         
-        .action-btn:active {
-            transform: scale(0.95);
-            background: rgba(255,255,255,0.3);
-        }
+        .action-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.3); }
         
         .action-btn.highlight {
             animation: highlight 1s infinite;
@@ -301,64 +270,33 @@
             50% { transform: scale(1.05); }
         }
         
-        .action-btn span {
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+        .action-btn span { font-size: 12px; font-weight: bold; text-transform: uppercase; }
         
-        .btn-feed:active, .btn-feed.highlight { background: rgba(255,107,107,0.5); }
-        .btn-play:active, .btn-play.highlight { background: rgba(78,205,196,0.5); }
-        .btn-code:active, .btn-code.highlight { background: rgba(69,183,209,0.5); }
-        
-        .xp-bar-container {
-            margin-top: 15px;
-            padding: 0 10px;
-        }
-        
-        .xp-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            margin-bottom: 5px;
-            opacity: 0.8;
-        }
-        
-        .xp-bar {
-            height: 8px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .xp-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #f093fb, #f5576c);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
+        .btn-feed.highlight { background: rgba(255,107,107,0.5); }
+        .btn-play.highlight { background: rgba(78,205,196,0.5); }
+        .btn-sleep.highlight { background: rgba(69,183,209,0.5); }
     </style>
 </head>
 <body>
-    <!-- STATE 1: EGG -->
+    <!-- EGG SCREEN -->
     <div class="egg-screen" id="eggScreen">
         <div class="egg-container" id="eggContainer">
             <div class="egg" id="egg">🥚</div>
             <div class="crack-overlay" id="crackOverlay">🐣</div>
         </div>
-        <div class="tap-hint">📱 Shake or tap 5 times!</div>
+        <div class="tap-hint">📱 Tap 5 times to hatch!</div>
         <div class="tap-counter" id="tapCounter">0 / 5</div>
     </div>
     
-    <!-- STATE 2: PET -->
+    <!-- PET SCREEN -->
     <div class="pet-screen" id="petScreen">
         <div class="header">
-            <div class="level-badge">⭐ Level <span id="levelNum">1</span> - <span id="stageName">Baby Bot</span></div>
+            <div class="pet-name" id="petName">My Pet</div>
+            <div class="level-badge">⭐ Level <span id="levelNum">1</span></div>
         </div>
         
-        <!-- PET DEMANDS -->
         <div class="speech-bubble" id="speechBubble" style="display: none;">
-            I'm hungry! Feed me! 🍕
+            Welcome!
         </div>
         
         <div class="pet-area">
@@ -387,16 +325,6 @@
                     <span class="stat-value" id="energyValue">100</span>
                 </div>
             </div>
-            
-            <div class="xp-bar-container">
-                <div class="xp-label">
-                    <span>XP</span>
-                    <span id="xpText">0/100</span>
-                </div>
-                <div class="xp-bar">
-                    <div class="xp-fill" id="xpBar" style="width: 0%"></div>
-                </div>
-            </div>
         </div>
         
         <div class="controls">
@@ -408,9 +336,9 @@
                 🎮
                 <span>Play</span>
             </button>
-            <button class="action-btn btn-code" id="codeBtn" onclick="action('code')">
-                💻
-                <span>Code</span>
+            <button class="action-btn btn-sleep" id="sleepBtn" onclick="action('sleep')">
+                💤
+                <span>Sleep</span>
             </button>
         </div>
     </div>
@@ -420,25 +348,18 @@
         tg.expand();
         tg.ready();
         
-        // ==================== GAME STATE ====================
+        // GAME STATE
         let gameState = {
             hatched: false,
             tapCount: 0,
-            stage: 0,
+            pet: null,
             level: 1,
-            xp: 0,
             hunger: 50,
             happy: 50,
             energy: 100
         };
         
-        const STAGES = ['Baby Bot', 'Teen Coder', 'Senior Dev', '10x Legend'];
-        const PETS = ['🤖', '💻', '🦖', '👑'];
-        
-        // Demands based on stats
-        // Using dialogue system from dialogues.js
-        
-        // ==================== EGG STATE ====================
+        // EGG SCREEN
         const eggContainer = document.getElementById('eggContainer');
         const egg = document.getElementById('egg');
         const crackOverlay = document.getElementById('crackOverlay');
@@ -450,25 +371,20 @@
             if (gameState.hatched) return;
             
             gameState.tapCount++;
-            
             egg.classList.add('shake');
             setTimeout(() => egg.classList.remove('shake'), 300);
-            
             tg.HapticFeedback.impactOccurred('light');
             
-            if (gameState.tapCount >= 3) {
-                crackOverlay.classList.add('show');
-            }
-            
+            if (gameState.tapCount >= 3) crackOverlay.classList.add('show');
             tapCounter.textContent = gameState.tapCount + ' / 5';
             
-            if (gameState.tapCount >= 5) {
-                hatchEgg();
-            }
+            if (gameState.tapCount >= 5) hatchEgg();
         });
         
         function hatchEgg() {
             gameState.hatched = true;
+            gameState.pet = getRandomPet();
+            
             egg.style.transition = 'all 0.5s';
             egg.style.transform = 'scale(1.5) rotate(10deg)';
             egg.style.opacity = '0';
@@ -479,170 +395,123 @@
                 eggScreen.style.display = 'none';
                 petScreen.classList.add('active');
                 
-                tg.showPopup({
-                    title: '🎉 Welcome!',
-                    message: 'Your Baby Bot has hatched! Take good care of it!'
-                });
+                document.getElementById('petCharacter').textContent = gameState.pet.emoji;
+                document.getElementById('petName').textContent = gameState.pet.name;
                 
+                // Show greeting
+                const hour = new Date().getHours();
+                let greeting;
+                if (hour < 12) greeting = getRandomDialogue(gameState.pet.type, 'greetings', 'morning');
+                else if (hour < 18) greeting = getRandomDialogue(gameState.pet.type, 'greetings', 'afternoon');
+                else if (hour < 23) greeting = getRandomDialogue(gameState.pet.type, 'greetings', 'evening');
+                else greeting = getRandomDialogue(gameState.pet.type, 'greetings', 'night');
+                
+                showBubble(greeting);
                 updateUI();
                 checkDemands();
             }, 500);
         }
         
-        // ==================== PET DEMANDS ====================
+        // PET DEMANDS
         function checkDemands() {
             if (!gameState.hatched) return;
             
             const bubble = document.getElementById('speechBubble');
             const feedBtn = document.getElementById('feedBtn');
             const playBtn = document.getElementById('playBtn');
-            const codeBtn = document.getElementById('codeBtn');
+            const sleepBtn = document.getElementById('sleepBtn');
             
-            // Remove all highlights
             feedBtn.classList.remove('highlight');
             playBtn.classList.remove('highlight');
-            codeBtn.classList.remove('highlight');
+            sleepBtn.classList.remove('highlight');
+            
+            document.getElementById('hungerRow').classList.remove('critical', 'warning');
+            document.getElementById('happyRow').classList.remove('critical', 'warning');
+            document.getElementById('energyRow').classList.remove('critical', 'warning');
             
             let demandText = '';
-            let demandType = '';
             
-            // Check critical stats (priority)
             if (gameState.hunger < 30) {
-                demandText = getDemand('hunger');
-                demandType = 'hunger';
+                demandText = getRandomDialogue(gameState.pet.type, 'demands', 'hunger');
                 feedBtn.classList.add('highlight');
                 document.getElementById('hungerRow').classList.add('critical');
-            } else if (gameState.happy < 30) {
-                demandText = getDemand('happy');
-                demandType = 'happy';
+            } else if (gameState.hunger < 60) {
+                document.getElementById('hungerRow').classList.add('warning');
+            }
+            
+            if (gameState.happy < 30) {
+                demandText = getRandomDialogue(gameState.pet.type, 'demands', 'happy');
                 playBtn.classList.add('highlight');
                 document.getElementById('happyRow').classList.add('critical');
-            } else if (gameState.energy > 30 && gameState.xp < 50) {
-                demandText = getDemand('code');
-                demandType = 'code';
-                codeBtn.classList.add('highlight');
+            } else if (gameState.happy < 60) {
+                document.getElementById('happyRow').classList.add('warning');
+            }
+            
+            if (gameState.energy < 30) {
+                if (!demandText) demandText = getRandomDialogue(gameState.pet.type, 'demands', 'energy');
+                sleepBtn.classList.add('highlight');
+                document.getElementById('energyRow').classList.add('critical');
+            } else if (gameState.energy < 60) {
+                document.getElementById('energyRow').classList.add('warning');
             }
             
             if (demandText) {
-                bubble.textContent = demandText;
-                bubble.className = 'speech-bubble ' + demandType;
-                bubble.style.display = 'block';
-                
+                showBubble(demandText);
                 tg.HapticFeedback.notificationOccurred('warning');
-            } else {
-                bubble.style.display = 'none';
-                document.getElementById('hungerRow').classList.remove('critical');
-                document.getElementById('happyRow').classList.remove('critical');
             }
         }
         
-        // ==================== PET ACTIONS ====================
+        // PET ACTIONS
         function action(type) {
             if (!gameState.hatched) return;
-            
             tg.HapticFeedback.impactOccurred('medium');
             
-            const bubble = document.getElementById('speechBubble');
+            let response = '';
             
             switch(type) {
                 case 'feed':
                     gameState.hunger = Math.min(100, gameState.hunger + 25);
-                    gameState.energy = Math.max(0, gameState.energy - 5);
-                    addXP(5);
-                    bubble.textContent = getResponse('feed');
-                    bubble.className = 'speech-bubble hunger';
+                    response = getRandomDialogue(gameState.pet.type, 'responses', 'feed');
                     break;
                 case 'play':
                     gameState.happy = Math.min(100, gameState.happy + 20);
                     gameState.energy = Math.max(0, gameState.energy - 10);
-                    gameState.hunger = Math.max(0, gameState.hunger - 5);
-                    addXP(10);
-                    bubble.textContent = getResponse('play');
-                    bubble.className = 'speech-bubble happy';
+                    response = getRandomDialogue(gameState.pet.type, 'responses', 'play');
                     break;
-                case 'code':
-                    if (gameState.energy < 10) {
-                        bubble.textContent = "Too tired... Need sleep 😴";
-                        bubble.className = 'speech-bubble energy';
-                        return;
-                    }
-                    gameState.energy = Math.max(0, gameState.energy - 8);
-                    gameState.hunger = Math.max(0, gameState.hunger - 3);
-                    addXP(20);
-                    bubble.textContent = getResponse('code');
-                    bubble.className = 'speech-bubble';
+                case 'sleep':
+                    gameState.energy = Math.min(100, gameState.energy + 30);
+                    response = getRandomDialogue(gameState.pet.type, 'responses', 'sleep');
                     break;
             }
             
-            bubble.style.display = 'block';
-            setTimeout(() => {
-                checkDemands();
-            }, 2000);
-            
+            showBubble(response);
             updateUI();
+            checkDemands();
         }
         
-        function addXP(amount) {
-            gameState.xp += amount;
-            
-            if (gameState.xp >= 100) {
-                gameState.level++;
-                gameState.xp = 0;
-                
-                tg.showPopup({
-                    title: '⭐ LEVEL UP!',
-                    message: `You're now Level ${gameState.level}!`
-                });
-                
-                const newStage = Math.floor((gameState.level - 1) / 5);
-                if (newStage > gameState.stage && newStage < 4) {
-                    gameState.stage = newStage;
-                    
-                    setTimeout(() => {
-                        tg.showPopup({
-                            title: '✨ EVOLUTION!',
-                            message: `Your pet evolved into ${STAGES[gameState.stage]}!`
-                        });
-                    }, 1000);
-                }
-            }
+        function showBubble(text) {
+            const bubble = document.getElementById('speechBubble');
+            bubble.textContent = text;
+            bubble.style.display = 'block';
         }
         
         function updateUI() {
-            document.getElementById('levelNum').textContent = gameState.level;
-            document.getElementById('stageName').textContent = STAGES[gameState.stage];
-            document.getElementById('petCharacter').textContent = PETS[gameState.stage];
-            
             document.getElementById('hungerBar').style.width = gameState.hunger + '%';
             document.getElementById('hungerValue').textContent = gameState.hunger;
-            
             document.getElementById('happyBar').style.width = gameState.happy + '%';
             document.getElementById('happyValue').textContent = gameState.happy;
-            
             document.getElementById('energyBar').style.width = gameState.energy + '%';
             document.getElementById('energyValue').textContent = gameState.energy;
-            
-            document.getElementById('xpBar').style.width = gameState.xp + '%';
-            document.getElementById('xpText').textContent = gameState.xp + '/100';
         }
         
         // Auto decay
         setInterval(() => {
             if (!gameState.hatched) return;
-            
             gameState.hunger = Math.max(0, gameState.hunger - 2);
             gameState.happy = Math.max(0, gameState.happy - 1);
-            
-            // Pet asks for things
-            if (Math.random() > 0.7) {
-                checkDemands();
-            }
-            
             updateUI();
-        }, 30000); // Every 30 seconds
-        
-        // Initial demand check
-        setTimeout(checkDemands, 1000);
+            if (Math.random() > 0.7) checkDemands();
+        }, 30000);
     </script>
 </body>
 </html>
