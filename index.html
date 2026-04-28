@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🐣 OpenClaw Pet</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="pet-data.js"></script>
-    <script src="accessories.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
@@ -79,8 +77,8 @@
         }
         
         @keyframes pulse {
-            0%, 100% { opacity: 0.9; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 1; }
         }
         
         /* PET SCREEN */
@@ -114,7 +112,7 @@
             font-size: 14px;
         }
         
-        /* SPEECH BUBBLE - DEMAND */
+        /* SPEECH BUBBLE */
         .speech-bubble {
             background: white;
             color: #333;
@@ -146,7 +144,6 @@
             100% { transform: scale(1); opacity: 1; }
         }
         
-        /* PET AREA */
         .pet-area {
             flex: 1;
             display: flex;
@@ -349,6 +346,119 @@
         tg.expand();
         tg.ready();
         
+        // PET DATA - 5 ANIMALS WITH ATTITUDES
+        const PETS = {
+            penguin: {
+                emoji: '🐧',
+                name: 'Pengu',
+                personality: 'cool_comedian',
+                greetings: {
+                    morning: ["Buz gibi bir gün! ☀️", "Günaydın dostum! ☕"],
+                    afternoon: ["Hey! Nasıl gidiyor? 🐧", "Öğleden sonra keyfi! 🎵"],
+                    evening: ["Akşam oldu! 🌙", "Gece modu aktif! 🦉"],
+                    night: ["Gece kuşuyuz! 🌃", "3 AM debugging? 💻"]
+                },
+                demands: {
+                    hunger: ["Buz gibi açım! Balık var mı? 🐟", "Açlıktan donuyorum! 🍕"],
+                    happy: ["Kaymak istiyorum! ⛸️", "Sıkıldım dostum! 🎮"],
+                    energy: ["Yoruldum... Uyku zamanı 😴", "Güç kaybediyorum 🔋"]
+                },
+                responses: {
+                    feed: ["Yummy! Buz gibi taze! 🐟", "Refueled! Thanks! ⚡"],
+                    play: ["Wheee! Efsane! ⛸️", "So much fun! ❄️"],
+                    sleep: ["Buz gibi rüyalar... 😴", "Zzz... ❄️"]
+                }
+            },
+            
+            cat: {
+                emoji: '🐱',
+                name: 'Kedi',
+                personality: 'independent_judgmental',
+                greetings: {
+                    morning: ["*yawn* Sabah mı? Neden? 😴", "Günaydın. Ama gece daha iyiydi. 🌙"],
+                    afternoon: ["Miyav. (Hoş geldin.) 🐱", "Öğle uykusu zamanı... 🛏️"],
+                    evening: ["Gece benim zamanım. 🌙", "Karanlık mod aktif. 🖤"],
+                    night: ["Sen uyusana? Ben kod yazarım. 💻", "Gece kuşuyuz. 🦉"]
+                },
+                demands: {
+                    hunger: ["*zamklı bakış* Miyav. (Açım.) 🍕", "Benle hiç ilgilenme! 🙄", "Aşık atmam ama... açım. 😏", "Yemek yok mu? Yazık. 🐱"],
+                    happy: ["Eğlence? Ama önce beni sev. 😼", "Sıkıldım. İlgi istiyorum. 🎮"],
+                    energy: ["*stretch* Uyku zamanı... 💤", "Yüksek yer istiyorum... 🏔️"]
+                },
+                responses: {
+                    feed: ["Miyav. (Kabul edilebilir.) 😼", "Tüylerim daha iyi. 🧹"],
+                    play: ["Eğlendim. Ama göstermiyorum. 😏", "İyi deneme. 🎮"],
+                    sleep: ["*purr* ... 💤", "Yüksekten uyuyorum... 🌙"]
+                }
+            },
+            
+            dog: {
+                emoji: '🐕',
+                name: 'Köpek',
+                personality: 'energetic_loyal_alarm',
+                greetings: {
+                    morning: ["GÜNAYDIN! SEVİYORUM! 🌅", "UYANDIN! HAV HAV! 🎉"],
+                    afternoon: ["ÖĞLEN OLDU! OYUN ZAMANI! 🎮", "SEN GELDİN! MUTLUYUM! 😄"],
+                    evening: ["AKŞAM! HÂLÂ OYNARIZ DEĞİL Mİ? 🌙", "GECE DE SEVİYORUM! 💕"],
+                    night: ["UYKU?! YARIN OYNARIZ DEĞİL Mİ? 🥺", "3 AM! HÂLÂ AÇIĞIM! 🍕"]
+                },
+                demands: {
+                    hunger: ["AÇIM! HEMEN! ŞİMDİ! 🥺", "KARNIM ZIL ÇALIYOR! 🔔"],
+                    happy: ["SIKILDIM! OYNA! 🎮", "Eee gezdirmeye çıkartmak için alarm kurmıcan mı? ⏰", "Beni dışarı çıkar! HAV! 🌳", "Top oynayalım! 🎾"],
+                    energy: ["YORULDUM AMA OYNAMAK İSTİYORUM! 🎾", "UYUMAK YOK! OYNA! 😴"]
+                },
+                responses: {
+                    feed: ["EN İYİ YEMEK! 🍕", "YUMMY! HAV HAV! 😋"],
+                    play: ["EN İYİ GÜN! 🎉", "DAHA FAZLA! HAV! 🎮"],
+                    sleep: ["YARIN DA OYNARIZ DEĞİL Mİ? 🥺", "RÜYAMDA SENİ GÖRECEĞİM! 💤"]
+                }
+            },
+            
+            fish: {
+                emoji: '🐠',
+                name: 'Balık',
+                personality: 'calm_philosopher',
+                greetings: {
+                    morning: ["*baloncuk* Gün doğumu... ☀️", "Sabah huzuru... 🌊"],
+                    afternoon: ["*baloncuk* Öğle vakti... 🕐", "Sakin sakin... 💭"],
+                    evening: ["*baloncuk* Akşam oluyor... 🌅", "Derin düşünceler... 🧠"],
+                    night: ["*baloncuk* Gece sessizliği... 🌙", "Derinlikler... 🌊"]
+                },
+                demands: {
+                    hunger: ["*baloncuk* Yem... 🐟", "Açlık... Su gibi akar... 🌊"],
+                    happy: ["*baloncuk* Hareket... 🎮", "Sıkıntı... Durgunluk... 😔"],
+                    energy: ["*baloncuk* Dinlenme... 💤", "Yorgunluk... Derinlikte... 🌊"]
+                },
+                responses: {
+                    feed: ["*baloncuk* Teşekkürler... 🐟", "Doydum... Huzur... 😌"],
+                    play: ["*baloncuk* Eğlence... Su gibi... 🎮", "Mutluluk... Dalga gibi... 🌊"],
+                    sleep: ["*baloncuk* Rüyalar... Derin denizler... 🌊", "Zzz... Baloncuklar... 💤"]
+                }
+            },
+            
+            chick: {
+                emoji: '🐥',
+                name: 'Civciv',
+                personality: 'energetic_hyper_curious',
+                greetings: {
+                    morning: ["CIK CIK! YENİ GÜN! 🌅", "UYANDIM! BÜYÜYORUM! 📈"],
+                    afternoon: ["CIK! ÖĞLEN OLDU! AÇIM! 🍕", "YENİ ŞEYLER KEŞFETMELİYİM! 🔍"],
+                    evening: ["CIK CIK! HÂLÂ AÇIĞIM! 🍕", "GECE OLMADAN DAHA FAZLA OYUN! 🎮"],
+                    night: ["CIK! UYKU YOK! KEŞİF! 🔍", "3 AM! BEN HÂLÂ AÇIĞIM! 🥚"]
+                },
+                demands: {
+                    hunger: ["AÇIM! HEMEN! YEMEK! ŞİMDİ! 🍕", "CIK CIK! KARNIM GURULDU! 🥁"],
+                    happy: ["SIKILDIM! OYNA! OYNA! 🎮", "YENİ ŞEYLER! KEŞİF! 🔍", "CIK! BENİ EĞLENDİR! 🎉", "BAK ŞUNA! ŞUNA BAK! 👀"],
+                    energy: ["YORULDUM AMA DURMAK YOK! 💪", "CIK! DİNLENMEK YOK! 🚀"]
+                },
+                responses: {
+                    feed: ["YUMMY! DAHA FAZLA! 🍕", "BÜYÜYORUM! GÖRÜYOR MUSUN! 📈"],
+                    play: ["EĞLENDİM! DAHA! DAHA! 🎉", "EN İYİ GÜN! CIK CIK! 🎮"],
+                    sleep: ["YARIN DAHA BÜYÜK OLACAĞIM! 🌟", "RÜYAMDA UÇACAĞIM! 💤"]
+                }
+            }
+        };
+        
         // GAME STATE
         let gameState = {
             hatched: false,
@@ -357,8 +467,30 @@
             level: 1,
             hunger: 50,
             happy: 50,
-            energy: 100
+            energy: 100,
+            coins: 0,
+            lastSaved: null
         };
+        
+        // Load from localStorage
+        function loadGame() {
+            const saved = localStorage.getItem('openclawPet');
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (data.hatched) {
+                    gameState = data;
+                    showPetScreen();
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Save to localStorage
+        function saveGame() {
+            gameState.lastSaved = new Date().toISOString();
+            localStorage.setItem('openclawPet', JSON.stringify(gameState));
+        }
         
         // EGG SCREEN
         const eggContainer = document.getElementById('eggContainer');
@@ -384,7 +516,9 @@
         
         function hatchEgg() {
             gameState.hatched = true;
-            gameState.pet = getRandomPet();
+            const petTypes = Object.keys(PETS);
+            const randomType = petTypes[Math.floor(Math.random() * petTypes.length)];
+            gameState.pet = { type: randomType, ...PETS[randomType] };
             
             egg.style.transition = 'all 0.5s';
             egg.style.transform = 'scale(1.5) rotate(10deg)';
@@ -393,31 +527,35 @@
             tg.HapticFeedback.notificationOccurred('success');
             
             setTimeout(() => {
-                eggScreen.style.display = 'none';
-                petScreen.classList.add('active');
-                
-                document.getElementById('petCharacter').textContent = gameState.pet.emoji;
-                document.getElementById('petName').textContent = gameState.pet.name;
-                
-                // Show greeting
-                const hour = new Date().getHours();
-                let greeting;
-                if (hour < 12) greeting = getRandomDialogue(gameState.pet.type, 'greetings', 'morning');
-                else if (hour < 18) greeting = getRandomDialogue(gameState.pet.type, 'greetings', 'afternoon');
-                else if (hour < 23) greeting = getRandomDialogue(gameState.pet.type, 'greetings', 'evening');
-                else greeting = getRandomDialogue(gameState.pet.type, 'greetings', 'night');
-                
-                showBubble(greeting);
-                updateUI();
-                checkDemands();
+                saveGame();
+                showPetScreen();
             }, 500);
+        }
+        
+        function showPetScreen() {
+            eggScreen.style.display = 'none';
+            petScreen.classList.add('active');
+            
+            document.getElementById('petCharacter').textContent = gameState.pet.emoji;
+            document.getElementById('petName').textContent = gameState.pet.name;
+            
+            // Show greeting based on time
+            const hour = new Date().getHours();
+            let greeting;
+            if (hour < 12) greeting = getRandom(gameState.pet.greetings.morning);
+            else if (hour < 18) greeting = getRandom(gameState.pet.greetings.afternoon);
+            else if (hour < 23) greeting = getRandom(gameState.pet.greetings.evening);
+            else greeting = getRandom(gameState.pet.greetings.night);
+            
+            showBubble(greeting);
+            updateUI();
+            checkDemands();
         }
         
         // PET DEMANDS
         function checkDemands() {
             if (!gameState.hatched) return;
             
-            const bubble = document.getElementById('speechBubble');
             const feedBtn = document.getElementById('feedBtn');
             const playBtn = document.getElementById('playBtn');
             const sleepBtn = document.getElementById('sleepBtn');
@@ -431,26 +569,33 @@
             document.getElementById('energyRow').classList.remove('critical', 'warning');
             
             let demandText = '';
+            let priority = 0;
             
             if (gameState.hunger < 30) {
-                demandText = getRandomDialogue(gameState.pet.type, 'demands', 'hunger');
+                demandText = getRandom(gameState.pet.demands.hunger);
                 feedBtn.classList.add('highlight');
                 document.getElementById('hungerRow').classList.add('critical');
+                priority = 3;
             } else if (gameState.hunger < 60) {
                 document.getElementById('hungerRow').classList.add('warning');
             }
             
             if (gameState.happy < 30) {
-                demandText = getRandomDialogue(gameState.pet.type, 'demands', 'happy');
-                playBtn.classList.add('highlight');
+                if (priority < 2) {
+                    demandText = getRandom(gameState.pet.demands.happy);
+                    playBtn.classList.add('highlight');
+                    priority = 2;
+                }
                 document.getElementById('happyRow').classList.add('critical');
             } else if (gameState.happy < 60) {
                 document.getElementById('happyRow').classList.add('warning');
             }
             
             if (gameState.energy < 30) {
-                if (!demandText) demandText = getRandomDialogue(gameState.pet.type, 'demands', 'energy');
-                sleepBtn.classList.add('highlight');
+                if (priority < 1) {
+                    demandText = getRandom(gameState.pet.demands.energy);
+                    sleepBtn.classList.add('highlight');
+                }
                 document.getElementById('energyRow').classList.add('critical');
             } else if (gameState.energy < 60) {
                 document.getElementById('energyRow').classList.add('warning');
@@ -471,21 +616,33 @@
             
             switch(type) {
                 case 'feed':
+                    if (gameState.hunger >= 100) {
+                        showBubble("Tokum! Yemek yemek istemiyorum! 🍕❌");
+                        return;
+                    }
                     gameState.hunger = Math.min(100, gameState.hunger + 25);
-                    response = getRandomDialogue(gameState.pet.type, 'responses', 'feed');
+                    response = getRandom(gameState.pet.responses.feed);
+                    gameState.coins += 5;
                     break;
                 case 'play':
+                    if (gameState.energy < 10) {
+                        showBubble("Çok yorgunum... Oynayamam... 😴");
+                        return;
+                    }
                     gameState.happy = Math.min(100, gameState.happy + 20);
                     gameState.energy = Math.max(0, gameState.energy - 10);
-                    response = getRandomDialogue(gameState.pet.type, 'responses', 'play');
+                    response = getRandom(gameState.pet.responses.play);
+                    gameState.coins += 10;
                     break;
                 case 'sleep':
                     gameState.energy = Math.min(100, gameState.energy + 30);
-                    response = getRandomDialogue(gameState.pet.type, 'responses', 'sleep');
+                    gameState.hunger = Math.max(0, gameState.hunger - 5);
+                    response = getRandom(gameState.pet.responses.sleep);
                     break;
             }
             
             showBubble(response);
+            saveGame();
             updateUI();
             checkDemands();
         }
@@ -505,246 +662,46 @@
             document.getElementById('energyValue').textContent = gameState.energy;
         }
         
-        // Auto decay
+        function getRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+        
+        // Auto decay - hunger and happy decrease over time
         setInterval(() => {
             if (!gameState.hatched) return;
+            
             gameState.hunger = Math.max(0, gameState.hunger - 2);
             gameState.happy = Math.max(0, gameState.happy - 1);
+            
             updateUI();
+            saveGame();
+            
             if (Math.random() > 0.7) checkDemands();
-        }, 30000);
+        }, 30000); // Every 30 seconds
+        
+        // Check if user returns after long time
+        function checkAwayTime() {
+            if (!gameState.lastSaved) return;
+            
+            const lastSaved = new Date(gameState.lastSaved);
+            const now = new Date();
+            const hoursAway = (now - lastSaved) / (1000 * 60 * 60);
+            
+            if (hoursAway > 6) {
+                // Pet missed user
+                gameState.hunger = Math.max(0, gameState.hunger - Math.floor(hoursAway * 5));
+                gameState.happy = Math.max(0, gameState.happy - Math.floor(hoursAway * 3));
+                
+                showBubble(getRandom(gameState.pet.demands.happy).replace('Sıkıldım', 'Seni özledim'));
+                saveGame();
+                updateUI();
+            }
+        }
+        
+        // Initialize
+        if (loadGame()) {
+            checkAwayTime();
+        }
     </script>
 </body>
 </html>
-
-    <!-- ACCESSORY SHOP MODAL -->
-    <div class="modal" id="shopModal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>🛍️ Aksesuar Mağazası</h2>
-                <button class="close-btn" onclick="closeShop()">✕</button>
-            </div>
-            <div class="shop-tabs">
-                <button class="tab-btn active" onclick="showTab('hats')">🎩 Şapkalar</button>
-                <button class="tab-btn" onclick="showTab('glasses')">👓 Gözlükler</button>
-                <button class="tab-btn" onclick="showTab('necklaces')">💎 Kolyeler</button>
-                <button class="tab-btn" onclick="showTab('others')">🎀 Diğer</button>
-            </div>
-            <div class="shop-content" id="shopContent">
-                <!-- Aksesuarlar buraya gelecek -->
-            </div>
-        </div>
-    </div>
-
-    <style>
-        /* SHOP STYLES */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        
-        .modal-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            max-height: 80vh;
-            overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.3);
-        }
-        
-        .modal-header {
-            padding: 20px;
-            background: rgba(0,0,0,0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-header h2 { margin: 0; font-size: 20px; }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        
-        .shop-tabs {
-            display: flex;
-            overflow-x: auto;
-            padding: 10px;
-            gap: 5px;
-            background: rgba(0,0,0,0.1);
-        }
-        
-        .tab-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px;
-            padding: 8px 15px;
-            color: white;
-            cursor: pointer;
-            white-space: nowrap;
-            font-size: 14px;
-        }
-        
-        .tab-btn.active {
-            background: rgba(255,255,255,0.3);
-            border-color: #ffd700;
-        }
-        
-        .shop-content {
-            padding: 15px;
-            overflow-y: auto;
-            max-height: 50vh;
-        }
-        
-        .accessory-item {
-            display: flex;
-            align-items: center;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border: 2px solid transparent;
-        }
-        
-        .accessory-item.owned {
-            border-color: #4ecdc4;
-        }
-        
-        .accessory-item.equipped {
-            border-color: #ffd700;
-            box-shadow: 0 0 10px rgba(255,215,0,0.3);
-        }
-        
-        .acc-emoji {
-            font-size: 40px;
-            margin-right: 15px;
-        }
-        
-        .acc-info {
-            flex: 1;
-        }
-        
-        .acc-name {
-            font-weight: bold;
-            font-size: 16px;
-        }
-        
-        .acc-effect {
-            font-size: 12px;
-            opacity: 0.8;
-            margin-top: 5px;
-        }
-        
-        .acc-price {
-            font-weight: bold;
-            color: #ffd700;
-        }
-        
-        .acc-btn {
-            background: rgba(255,215,0,0.3);
-            border: 1px solid #ffd700;
-            border-radius: 10px;
-            padding: 8px 15px;
-            color: white;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        .acc-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .shop-btn {
-            background: rgba(255,215,0,0.2);
-            border: 2px solid #ffd700;
-            border-radius: 15px;
-            padding: 10px 20px;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        
-        .coins-display {
-            background: rgba(255,215,0,0.2);
-            border-radius: 20px;
-            padding: 10px 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .coins-display span {
-            font-size: 20px;
-        }
-    </style>
-
-    <script>
-        // Aksesuar mağazası fonksiyonları
-        function openShop() {
-            document.getElementById('shopModal').style.display = 'flex';
-            showTab('hats');
-        }
-        
-        function closeShop() {
-            document.getElementById('shopModal').style.display = 'none';
-        }
-        
-        function showTab(category) {
-            // Tab'ları güncelle
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // İçeriği doldur
-            const container = document.getElementById('shopContent');
-            container.innerHTML = '';
-            
-            const items = ACCESSORIES[category] || [];
-            items.forEach(item => {
-                const isOwned = ownedAccessories.includes(item.id);
-                const isEquipped = Object.values(equippedAccessories).includes(item.id);
-                
-                const div = document.createElement('div');
-                div.className = `accessory-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}`;
-                div.innerHTML = `
-                    <div class="acc-emoji">${item.emoji}</div>
-                    <div class="acc-info">
-                        <div class="acc-name">${item.name}</div>
-                        <div class="acc-effect">${item.effect}</div>
-                    </div>
-                    ${isOwned ? 
-                        (isEquipped ? 
-                            '<button class="acc-btn" onclick="unequipAccessory(\'' + category + '\')">Çıkar</button>' :
-                            '<button class="acc-btn" onclick="equipAccessory(\'' + item.id + '\')">Giy</button>'
-                        ) :
-                        '<div class="acc-price">🪙 ${item.price}</div><button class="acc-btn" onclick="buyAccessory(\'' + item.id + '\')">Satın Al</button>'
-                    }
-                `;
-                container.appendChild(div);
-            });
-        }
-        
-        // Mağaza butonunu ekle
-        const controls = document.querySelector('.controls');
-        const shopBtn = document.createElement('button');
-        shopBtn.className = 'shop-btn';
-        shopBtn.innerHTML = '🛍️ Mağaza';
-        shopBtn.onclick = openShop;
-        shopBtn.style.gridColumn = 'span 3';
-        controls.appendChild(shopBtn);
-    </script>
