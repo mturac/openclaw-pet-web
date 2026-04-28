@@ -6,43 +6,32 @@
     <title>🐣 OpenClaw Pet</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
         
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             height: 100vh;
             overflow: hidden;
+            user-select: none;
         }
         
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 15px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        
-        .pet-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 20px;
-            flex: 1;
+        /* ==================== STATE 1: EGG SCREEN ==================== */
+        .egg-screen {
             display: flex;
             flex-direction: column;
             align-items: center;
-            border: 2px solid rgba(255,255,255,0.2);
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
         }
         
-        /* EGG CRACKING ANIMATION */
         .egg-container {
             position: relative;
             width: 200px;
@@ -55,343 +44,405 @@
         
         .egg {
             font-size: 120px;
-            animation: eggShake 2s infinite;
-            transition: all 0.5s;
+            transition: transform 0.1s;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
         }
         
-        .egg.cracking {
-            animation: eggCrack 0.5s forwards;
+        .egg.shake {
+            animation: shake 0.1s ease-in-out;
         }
         
-        .egg.broken {
-            animation: none;
-            opacity: 0;
-            transform: scale(0);
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-5deg) scale(1.05); }
+            75% { transform: rotate(5deg) scale(1.05); }
         }
         
-        @keyframes eggShake {
-            0%, 100% { transform: rotate(-2deg); }
-            50% { transform: rotate(2deg); }
-        }
-        
-        @keyframes eggCrack {
-            0% { transform: scale(1) rotate(0); }
-            25% { transform: scale(1.1) rotate(-5deg); }
-            50% { transform: scale(1.1) rotate(5deg); }
-            75% { transform: scale(1.2) rotate(-3deg); }
-            100% { transform: scale(0) rotate(0); opacity: 0; }
-        }
-        
-        /* CRACK LINES */
-        .crack-lines {
+        .crack-overlay {
             position: absolute;
-            font-size: 100px;
+            font-size: 120px;
             opacity: 0;
+            transition: opacity 0.3s;
             pointer-events: none;
         }
         
-        .crack-lines.show {
-            animation: showCrack 0.3s forwards;
-        }
-        
-        @keyframes showCrack {
-            0% { opacity: 0; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        
-        /* PET */
-        .pet {
-            position: absolute;
-            font-size: 100px;
-            opacity: 0;
-            transform: scale(0);
-            transition: all 0.5s;
-        }
-        
-        .pet.hatched {
+        .crack-overlay.show {
             opacity: 1;
-            transform: scale(1);
-            animation: petBounce 1s infinite;
         }
         
-        @keyframes petBounce {
-            0%, 100% { transform: scale(1) translateY(0); }
-            50% { transform: scale(1.1) translateY(-10px); }
-        }
-        
-        .shake-hint {
-            margin-top: 20px;
-            font-size: 14px;
-            opacity: 0.7;
+        .tap-hint {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 16px;
+            opacity: 0.8;
             animation: pulse 2s infinite;
         }
         
+        .tap-counter {
+            margin-top: 10px;
+            font-size: 14px;
+            opacity: 0.6;
+        }
+        
         @keyframes pulse {
-            0%, 100% { opacity: 0.7; }
+            0%, 100% { opacity: 0.8; }
             50% { opacity: 1; }
         }
         
-        .stats {
+        /* ==================== STATE 2: PET SCREEN ==================== */
+        .pet-screen {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            padding: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .pet-screen.active {
+            display: flex;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .level-badge {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        /* Pet Area */
+        .pet-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            margin: 10px 0;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .pet-character {
+            font-size: 100px;
+            animation: bounce 2s infinite ease-in-out;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+        
+        /* Stats */
+        .stats-container {
             width: 100%;
+            padding: 0 20px;
             margin-top: 20px;
-            opacity: 0;
-            transition: opacity 0.5s;
         }
         
-        .stats.show {
-            opacity: 1;
-        }
-        
-        .stat {
+        .stat-row {
             display: flex;
             align-items: center;
-            margin: 10px 0;
-            background: rgba(255,255,255,0.1);
-            padding: 10px;
+            margin: 12px 0;
+            background: rgba(0,0,0,0.2);
+            padding: 10px 15px;
             border-radius: 15px;
         }
         
-        .stat-bar {
+        .stat-icon {
+            font-size: 20px;
+            margin-right: 10px;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .stat-bar-bg {
             flex: 1;
-            height: 15px;
+            height: 20px;
             background: rgba(0,0,0,0.3);
             border-radius: 10px;
             overflow: hidden;
-            margin: 0 10px;
+            margin-right: 10px;
         }
         
-        .stat-fill {
+        .stat-bar-fill {
             height: 100%;
             border-radius: 10px;
-            transition: width 0.5s;
+            transition: width 0.5s ease;
         }
         
-        .hunger-fill { background: #ff6b6b; }
-        .happy-fill { background: #4ecdc4; }
-        .energy-fill { background: #45b7d1; }
+        .hunger-fill { background: linear-gradient(90deg, #ff6b6b, #ff8e8e); }
+        .happy-fill { background: linear-gradient(90deg, #4ecdc4, #6ee7df); }
+        .energy-fill { background: linear-gradient(90deg, #45b7d1, #74c7e3); }
         
+        .stat-value {
+            width: 35px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        /* Buttons */
         .controls {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 12px;
             margin-top: 15px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s;
         }
         
-        .controls.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-        
-        .btn {
+        .action-btn {
             background: rgba(255,255,255,0.2);
-            border: none;
-            border-radius: 15px;
-            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            padding: 15px 10px;
+            color: white;
             font-size: 24px;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
         }
         
-        .btn:active {
+        .action-btn:active {
             transform: scale(0.95);
+            background: rgba(255,255,255,0.3);
         }
+        
+        .action-btn span {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .btn-feed:active { background: rgba(255,107,107,0.5); }
+        .btn-play:active { background: rgba(78,205,196,0.5); }
+        .btn-code:active { background: rgba(69,183,209,0.5); }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- STATE 1: EGG -->
+    <div class="egg-screen" id="eggScreen">
+        <div class="egg-container" id="eggContainer">
+            <div class="egg" id="egg">🥚</div>
+            <div class="crack-overlay" id="crackOverlay">🐣</div>
+        </div>
+        <div class="tap-hint">📱 Tap 5 times to hatch!</div>
+        <div class="tap-counter" id="tapCounter">0 / 5</div>
+    </div>
+    
+    <!-- STATE 2: PET -->
+    <div class="pet-screen" id="petScreen">
         <div class="header">
-            <h1>🐣 OpenClaw Pet</h1>
-        </        </div>
+            <div class="level-badge">⭐ Level <span id="levelNum">1</span> - <span id="stageName">Baby Bot</span></div>
+        </div>
         
-        <div class="pet-card">
-            <div class="egg-container" id="eggContainer" onclick="tapEgg()">
-                <div class="egg" id="egg">🥚</div>
-                <div class="crack-lines" id="crackLines">🐣</div>
-                <div class="pet" id="pet">🤖</div>
-            </div>
+        <div class="pet-area">
+            <div class="pet-character" id="petCharacter">🤖</div>
             
-            <div class="shake-hint" id="shakeHint">
-                📱 Shake phone or tap egg to hatch!
-            </div>
-            
-            <div class="stats" id="stats">
-                <div class="stat">
-                    <span>🍕</span>
-                    <div class="stat-bar"><div class="stat-fill hunger-fill" id="hunger" style="width: 50%"></div></div>
-                    <span id="hungerVal">50</span>
+            <div class="stats-container">
+                <div class="stat-row">
+                    <span class="stat-icon">🍕</span>
+                    <div class="stat-bar-bg">
+                        <div class="stat-bar-fill hunger-fill" id="hungerBar" style="width: 50%"></div>
+                    </div>
+                    <span class="stat-value" id="hungerValue">50</span>
                 </div>
-                <div class="stat">
-                    <span>😊</span>
-                    <div class="stat-bar"><div class="stat-fill happy-fill" id="happy" style="width: 50%"></div></div>
-                    <span id="happyVal">50</span>
+                <div class="stat-row">
+                    <span class="stat-icon">😊</span>
+                    <div class="stat-bar-bg">
+                        <div class="stat-bar-fill happy-fill" id="happyBar" style="width: 50%"></div>
+                    </div>
+                    <span class="stat-value" id="happyValue">50</span>
                 </div>
-                <div class="stat">
-                    <span>⚡</span>
-                    <div class="stat-bar"><div class="stat-fill energy-fill" id="energy" style="width: 100%"></div></div>
-                    <span id="energyVal">100</span>
+                <div class="stat-row">
+                    <span class="stat-icon">⚡</span>
+                    <div class="stat-bar-bg">
+                        <div class="stat-bar-fill energy-fill" id="energyBar" style="width: 100%"></div>
+                    </div>
+                    <span class="stat-value" id="energyValue">100</span>
                 </div>
             </div>
         </div>
         
-        <div class="controls" id="controls">
-            <button class="btn" onclick="feed()">🍕</button>
-            <button class="btn" onclick="play()">🎮</button>
-            <button class="btn" onclick="code()">💻</button>
+        <div class="controls">
+            <button class="action-btn btn-feed" onclick="action('feed')">
+                🍕
+                <span>Feed</span>
+            </button>
+            <button class="action-btn btn-play" onclick="action('play')">
+                🎮
+                <span>Play</span>
+            </button>
+            <button class="action-btn btn-code" onclick="action('code')">
+                💻
+                <span>Code</span>
+            </button>
         </div>
     </div>
 
     <script>
+        // Initialize Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
         
-        let hatched = false;
-        let tapCount = 0;
-        
-        let pet = {
+        // ==================== GAME STATE ====================
+        let gameState = {
+            hatched: false,
+            tapCount: 0,
+            stage: 0, // 0=Baby, 1=Teen, 2=Adult, 3=Legend
+            level: 1,
+            xp: 0,
             hunger: 50,
             happy: 50,
-            energy: 100,
-            stage: 0
+            energy: 100
         };
         
-        // SHAKE DETECTION
-        let lastX = 0, lastY = 0, lastZ = 0;
-        let shakeThreshold = 15;
+        const STAGES = ['Baby Bot', 'Teen Coder', 'Senior Dev', '10x Legend'];
+        const PETS = ['🤖', '💻', '🦖', '👑'];
         
-        if (window.DeviceMotionEvent) {
-            window.addEventListener('devicemotion', function(event) {
-                let acceleration = event.accelerationIncludingGravity;
-                let currentX = acceleration.x;
-                let currentY = acceleration.y;
-                let currentZ = acceleration.z;
-                
-                let deltaX = Math.abs(currentX - lastX);
-                let deltaY = Math.abs(currentY - lastY);
-                let deltaZ = Math.abs(currentZ - lastZ);
-                
-                if ((deltaX > shakeThreshold || deltaY > shakeThreshold || deltaZ > shakeThreshold) && !hatched) {
-                    tapEgg();
-                }
-                
-                lastX = currentX;
-                lastY = currentY;
-                lastZ = currentZ;
-            }, false);
-        }
+        // ==================== EGG STATE ====================
+        const eggContainer = document.getElementById('eggContainer');
+        const egg = document.getElementById('egg');
+        const crackOverlay = document.getElementById('crackOverlay');
+        const tapCounter = document.getElementById('tapCounter');
+        const eggScreen = document.getElementById('eggScreen');
+        const petScreen = document.getElementById('petScreen');
         
-        function tapEgg() {
-            if (hatched) return;
+        eggContainer.addEventListener('click', function() {
+            if (gameState.hatched) return;
             
-            tapCount++;
-            const egg = document.getElementById('egg');
-            const crackLines = document.getElementById('crackLines');
+            gameState.tapCount++;
             
-            // Vibrate
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
+            // Visual feedback
+            egg.classList.add('shake');
+            setTimeout(() => egg.classList.remove('shake'), 100);
+            
+            // Haptic
             tg.HapticFeedback.impactOccurred('light');
             
-            // Visual shake
-            egg.style.transform = `rotate(${Math.random() * 10 - 5}deg) scale(${1 + tapCount * 0.05})`;
-            
             // Show crack after 3 taps
-            if (tapCount >= 3) {
-                crackLines.classList.add('show');
+            if (gameState.tapCount >= 3) {
+                crackOverlay.classList.add('show');
             }
             
-            // Hatch after 5 taps
-            if (tapCount >= 5) {
+            // Update counter
+            tapCounter.textContent = gameState.tapCount + ' / 5';
+            
+            // HATCH!
+            if (gameState.tapCount >= 5) {
                 hatchEgg();
             }
-        }
+        });
         
         function hatchEgg() {
-            hatched = true;
-            const egg = document.getElementById('egg');
-            const crackLines = document.getElementById('crackLines');
-            const pet = document.getElementById('pet');
-            const hint = document.getElementById('shakeHint');
-            const stats = document.getElementById('stats');
-            const controls = document.getElementById('controls');
+            gameState.hatched = true;
             
             // Animation
-            egg.classList.add('cracking');
+            egg.style.transition = 'all 0.5s';
+            egg.style.transform = 'scale(1.5) rotate(10deg)';
+            egg.style.opacity = '0';
             
-            // Sound
-            playHatchSound();
-            
-            // Vibrate pattern
-            if (navigator.vibrate) {
-                navigator.vibrate([100, 50, 100, 50, 200]);
-            }
             tg.HapticFeedback.notificationOccurred('success');
             
             setTimeout(() => {
-                egg.classList.add('broken');
-                crackLines.style.opacity = '0';
-                pet.classList.add('hatched');
-                hint.style.display = 'none';
-                stats.classList.add('show');
-                controls.classList.add('active');
+                // Switch screens
+                eggScreen.style.display = 'none';
+                petScreen.classList.add('active');
                 
+                // Show welcome popup
                 tg.showPopup({
-                    title: '🎉 It\'s a Baby Bot!',
-                    message: 'Your pet has hatched! Take good care of it!'
+                    title: '🎉 Welcome!',
+                    message: 'Your Baby Bot has hatched! Take good care of it!'
                 });
+                
+                updateUI();
             }, 500);
         }
         
-        function playHatchSound() {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
+        // ==================== PET STATE ====================
+        function action(type) {
+            if (!gameState.hatched) return;
             
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-            oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.1);
-            oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.3);
-            
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-            
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.5);
-        }
-        
-        function feed() {
-            pet.hunger = Math.min(100, pet.hunger + 20);
-            updateUI();
-            tg.HapticFeedback.impactOccurred('light');
-        }
-        
-        function play() {
-            pet.happy = Math.min(100, pet.happy + 15);
-            pet.energy = Math.max(0, pet.energy - 10);
-            updateUI();
             tg.HapticFeedback.impactOccurred('medium');
+            
+            switch(type) {
+                case 'feed':
+                    gameState.hunger = Math.min(100, gameState.hunger + 20);
+                    gameState.energy = Math.max(0, gameState.energy - 5);
+                    addXP(5);
+                    break;
+                case 'play':
+                    gameState.happy = Math.min(100, gameState.happy + 15);
+                    gameState.energy = Math.max(0, gameState.energy - 10);
+                    gameState.hunger = Math.max(0, gameState.hunger - 10);
+                    addXP(10);
+                    break;
+                case 'code':
+                    gameState.energy = Math.max(0, gameState.energy - 5);
+                    addXP(15);
+                    break;
+            }
+            
+            updateUI();
         }
         
-        function code() {
-            pet.energy = Math.max(0, pet.energy - 5);
-            updateUI();
-            tg.HapticFeedback.notificationOccurred('success');
+        function addXP(amount) {
+            gameState.xp += amount;
+            
+            if (gameState.xp >= 100) {
+                gameState.level++;
+                gameState.xp = 0;
+                
+                // Check evolution
+                const newStage = Math.floor((gameState.level - 1) / 5);
+                if (newStage > gameState.stage && newStage < 4) {
+                    gameState.stage = newStage;
+                    
+                    tg.showPopup({
+                        title: '✨ Evolution!',
+                        message: `Your pet evolved into ${STAGES[gameState.stage]}!`
+                    });
+                }
+            }
         }
         
         function updateUI() {
-            document.getElementById('hunger').style.width = pet.hunger + '%';
-            document.getElementById('hungerVal').textContent = pet.hunger;
-            document.getElementById('happy').style.width = pet.happy + '%';
-            document.getElementById('happyVal').textContent = pet.happy;
-            document.getElementById('energy').style.width = pet.energy + '%';
-            document.getElementById('energyVal').textContent = pet.energy;
+            document.getElementById('levelNum').textContent = gameState.level;
+            document.getElementById('stageName').textContent = STAGES[gameState.stage];
+            document.getElementById('petCharacter').textContent = PETS[gameState.stage];
+            
+            document.getElementById('hungerBar').style.width = gameState.hunger + '%';
+            document.getElementById('hungerValue').textContent = gameState.hunger;
+            
+            document.getElementById('happyBar').style.width = gameState.happy + '%';
+            document.getElementById('happyValue').textContent = gameState.happy;
+            
+            document.getElementById('energyBar').style.width = gameState.energy + '%';
+            document.getElementById('energyValue').textContent = gameState.energy;
         }
+        
+        // Auto decay (every minute)
+        setInterval(() => {
+            if (!gameState.hatched) return;
+            
+            gameState.hunger = Math.max(0, gameState.hunger - 1);
+            gameState.happy = Math.max(0, gameState.happy - 1);
+            updateUI();
+        }, 60000);
     </script>
 </body>
 </html>
